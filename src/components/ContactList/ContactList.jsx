@@ -1,26 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { ContactListWrapper, ButtonDelete } from './ContactList.styled';
-import { deleteContact, getContacts } from '../../redux/contactsSlice';
-import { getFilter } from '../../redux/filterSlice';
+import { selectFilteredContacts } from '../../redux/selectors';
+import { deleteContact } from '../../redux/operations';
 
 export const ContactList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
+  const filteredContacts = useSelector(selectFilteredContacts);
   const dispatch = useDispatch();
-
-  const getFilteredContacts = () => {
-    return contacts.filter(contact =>
-      contact.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())
-    );
-  };
-
-  const filteredContacts = getFilteredContacts();
 
   return (
     <ContactListWrapper>
       {filteredContacts.map(contact => (
         <li key={contact.id}>
-          {contact.name}: {contact.number}
+          {contact.name}: {contact.phone}
           <ButtonDelete onClick={() => dispatch(deleteContact(contact.id))}>
             Delete
           </ButtonDelete>

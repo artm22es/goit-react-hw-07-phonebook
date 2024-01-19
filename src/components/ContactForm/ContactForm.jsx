@@ -2,9 +2,10 @@ import * as Yup from 'yup';
 import Notiflix from 'notiflix';
 import { Field, Formik } from 'formik';
 import { ContactFormWrapper, ButtonForm, Error } from './ContactForm.styled';
-import { addContact, getContacts } from '../../redux/contactsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from 'nanoid';
+import { selectContacts } from '../../redux/selectors';
+import { addContact } from '../../redux/operations';
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
@@ -16,7 +17,7 @@ const ContactSchema = Yup.object().shape({
     .min(3, 'Too short contact name!')
     .max(50, 'Too long contact name!')
     .required('Required'),
-  number: Yup.string()
+  phone: Yup.string()
     .trim()
     .matches(
       /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/,
@@ -26,7 +27,7 @@ const ContactSchema = Yup.object().shape({
 });
 
 export const ContactForm = () => {
-  const contacts = useSelector(getContacts);
+  const contacts = useSelector(selectContacts);
   const dispatch = useDispatch();
 
   const onSubmitForm = (values, helpers) => {
@@ -36,13 +37,13 @@ export const ContactForm = () => {
       return;
     }
 
-    dispatch(addContact(values));
+    dispatch(addContact({ ...values, id: nanoid() }));
     helpers.resetForm();
   };
 
   return (
     <Formik
-      initialValues={{ name: '', number: '', id: nanoid() }}
+      initialValues={{ name: '', phone: '' }}
       validationSchema={ContactSchema}
       onSubmit={onSubmitForm}
     >
@@ -53,9 +54,9 @@ export const ContactForm = () => {
           <Error component="p" name="name" />
         </label>
         <label>
-          Number
-          <Field type="tel" autoComplete="off" name="number" required />
-          <Error component="p" name="number" />
+          Phone
+          <Field type="tel" autoComplete="off" name="phone" required />
+          <Error component="p" name="phone" />
         </label>
         <ButtonForm type="submit">Add contact</ButtonForm>
       </ContactFormWrapper>
